@@ -1,19 +1,5 @@
 AC_DEFUN([ONMS_CHECK_JDK],
   [
-    dnl look for java in various places
-    dnl first check where the told me
-    dnl if the didn't tell me look in JAVA_HOME
-    dnl then look in the Mac Location
-    dnl then look in /etc/alternatives or whatever
-    dnl then look in /usr/java/default
-    dnl then look in /usr/java/*
-    dnl then look in /usr/local/java
-    dnl other places?
-    dnl need to verify its the correct version (or later)
-    dnl need to verify that it has javah
-    dnl need to verify that it has javac
-    dnl need to verify that it has jni headers 
-
     AC_ARG_WITH([java],
       [AS_HELP_STRING([--with-java=JAVA_HOME], [set the path to JAVA_HOME for the jdk])],
       [],
@@ -51,7 +37,6 @@ AC_DEFUN([ONMS_FIND_JDK],
     )
 
     AC_PATH_PROG([java_from_path], [java])
-    echo java_from_path=$java_from_path
     java_home_from_path=
     AS_IF([test "x$java_from_path" != "x"],
       [
@@ -61,7 +46,7 @@ AC_DEFUN([ONMS_FIND_JDK],
          done
          java_home_from_path=`AS_DIRNAME(["$java_from_path"])`
          java_home_from_path=`AS_DIRNAME(["$java_home_from_path"])`
-	 _ONMS_TRY_JAVA_DIR([$java_home_from_path], [$1], [AC_MSG_NOTICE([attempting to find the jdk using java in your path.])])
+	 _ONMS_TRY_JAVA_DIR([$java_home_from_path], [$1], [AC_MSG_NOTICE([attempting to find the jdk for $java_from_path.])])
          AS_UNSET([java_from_path])
          AS_UNSET([java_home_from_path])
       ]
@@ -102,12 +87,38 @@ AC_DEFUN([ONMS_VALIDATE_JDK],
     _ONMS_CHECK_FOR_JAR($1)   
     _ONMS_CHECK_FOR_JAVAH($1)
     _ONMS_CHECK_JAVA_VERSION($2)
+    _ONMS_CHECK_FOR_JNI_HEADERS($1)
+
 
     AS_IF([test "$HAS_JDK" != yes], 
           [AC_MSG_NOTICE([no valid jdk found at $1])],
           [AC_MSG_NOTICE([found a valid jdk. setting JAVA_HOME to $1]); JAVA_HOME="$1"]
     )
 
+  ]
+)
+
+AC_DEFUN([_ONMS_CHECK_FOR_JNI_HEADERS],
+  [
+    AS_IF([test "$HAS_JDK" = yes],
+      [
+        AC_MSG_CHECKING([for jni headers])
+        HAS_JNI_HEADERS=yes
+	AS_IF([test -d "$1/include" && test -f "$1/include/jni.h"],
+          [
+            JNI_INCLUDES=`find "$1/include/" -type d | while read dir
+            do
+	      echo $ECHO_N "-I$dir "
+            done`
+	  ],
+          [ dnl no include directory so invalid jdk
+            HAS_JNI_HEADERS=no
+            HAS_JDK=no
+          ]
+        )
+        AC_MSG_RESULT([$HAS_JNI_HEADERS])
+      ]
+    )
   ]
 )
 
