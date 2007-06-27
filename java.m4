@@ -27,7 +27,7 @@ AC_DEFUN([ONMS_CHECK_JDK],
     )
 
     AS_IF([test "x$HAS_JDK" = "x" || test "$HAS_JDK" = "false" || test "$HAS_JDK" = "no"],
-          [AC_MSG_ERROR([unable to find a valid jdk])])
+          [AC_MSG_ERROR([unable to find a valid jdk for java version $1])])
 
     AC_MSG_NOTICE([using jdk at $JAVA_HOME])
 
@@ -50,8 +50,32 @@ AC_DEFUN([ONMS_FIND_JDK],
       [_ONMS_TRY_JAVA_DIR([$JAVA_HOME], [$1], [AC_MSG_NOTICE([trying the value in JAVA_HOME])])]
     )
 
+    AC_PATH_PROG([java_from_path], [java])
+    echo java_from_path=$java_from_path
+    java_home_from_path=
+    AS_IF([test "x$java_from_path" != "x"],
+      [
+         while test -h "$java_from_path"
+         do
+             java_from_path=`readlink $java_from_path`
+         done
+         java_home_from_path=`AS_DIRNAME(["$java_from_path"])`
+         java_home_from_path=`AS_DIRNAME(["$java_home_from_path"])`
+	 _ONMS_TRY_JAVA_DIR([$java_home_from_path], [$1], [AC_MSG_NOTICE([attempting to find the jdk using java in your path.])])
+         AS_UNSET([java_from_path])
+         AS_UNSET([java_home_from_path])
+      ]
+    )
+
     _ONMS_TRY_JAVA_DIR([/Library/Java/Home], [$1])
     _ONMS_TRY_JAVA_DIR([/usr/java/default], [$1])
+
+    for java_dir in /usr/java/*
+    do
+      _ONMS_TRY_JAVA_DIR([$java_dir], [$1])
+    done
+
+    _ONMS_TRY_JAVA_DIR([/usr/local/java], [$1])    
     
   ]
 )
