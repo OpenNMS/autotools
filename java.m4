@@ -17,6 +17,13 @@ AC_DEFUN([ONMS_CHECK_JDK],
 
     AC_MSG_NOTICE([using jdk at $JAVA_HOME])
 
+    case $host_os in
+        darwin*)
+            JAVA_SHREXT_COMMAND="-shrext .jnilib"
+            ;;
+    esac
+
+    AC_SUBST([JAVA_SHREXT_COMMAND])
     AC_SUBST([JAVA_HOME])
     AC_SUBST([JAVA])
     AC_SUBST([JAR])
