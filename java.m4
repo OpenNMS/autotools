@@ -5,11 +5,16 @@ AC_DEFUN([ONMS_CHECK_JDK],
       [],
       [with_java=check])
 
+    AC_ARG_WITH([jvm-arch],
+      [AS_HELP_STRING([--with-jvm-arch=(32|64)], [set the architecture to build (default: check)])],
+      [],
+      [with_jvm_arch=none])
+
     AS_IF([test "x$with_java" = "xno"], [AC_MSG_ERROR([the path to a jdk is required to build jrrd])])
     AS_IF([test "x$with_java" = "xyes"], [AC_MSG_ERROR([the argument to --with-java must specify a JDK])])
     AS_IF([test "x$with_java" = "xcheck"], 
-          [ONMS_FIND_JDK($1)],
-          [ONMS_VALIDATE_JDK(["$with_java"], $1)]
+          [ONMS_FIND_JDK($1, ["$with_jvm_arch"])],
+          [ONMS_VALIDATE_JDK(["$with_java"], $1, ["$with_jvm_arch"])]
     )
 
     AS_IF([test "x$HAS_JDK" = "x" || test "$HAS_JDK" = "false" || test "$HAS_JDK" = "no"],
@@ -40,7 +45,7 @@ AC_DEFUN([ONMS_FIND_JDK],
     
     HAS_JDK=no
     AS_IF([test "x$JAVA_HOME" != "x"], 
-      [_ONMS_TRY_JAVA_DIR([$JAVA_HOME], [$1], [AC_MSG_NOTICE([trying the value in JAVA_HOME])])]
+      [_ONMS_TRY_JAVA_DIR([$JAVA_HOME], [$1], [AC_MSG_NOTICE([trying the value in JAVA_HOME])], [$2])]
     )
 
     AC_PATH_PROG([java_from_path], [java])
@@ -53,21 +58,21 @@ AC_DEFUN([ONMS_FIND_JDK],
          done
          java_home_from_path=`AS_DIRNAME(["$java_from_path"])`
          java_home_from_path=`AS_DIRNAME(["$java_home_from_path"])`
-	 _ONMS_TRY_JAVA_DIR([$java_home_from_path], [$1], [AC_MSG_NOTICE([attempting to find the jdk for $java_from_path.])])
+	 _ONMS_TRY_JAVA_DIR([$java_home_from_path], [$1], [AC_MSG_NOTICE([attempting to find the jdk for $java_from_path.])], [$2])
          AS_UNSET([java_from_path])
          AS_UNSET([java_home_from_path])
       ]
     )
 
-    _ONMS_TRY_JAVA_DIR([/Library/Java/Home], [$1])
-    _ONMS_TRY_JAVA_DIR([/usr/java/default], [$1])
+    _ONMS_TRY_JAVA_DIR([/Library/Java/Home], [$1], [], [$2])
+    _ONMS_TRY_JAVA_DIR([/usr/java/default], [$1], [], [$2])
 
     for java_dir in /usr/java/*
     do
-      _ONMS_TRY_JAVA_DIR([$java_dir], [$1])
+      _ONMS_TRY_JAVA_DIR([$java_dir], [$1], [], [$2])
     done
 
-    _ONMS_TRY_JAVA_DIR([/usr/local/java], [$1])    
+    _ONMS_TRY_JAVA_DIR([/usr/local/java], [$1], [], [$2])
     
   ]
 )
@@ -77,7 +82,7 @@ AC_DEFUN([_ONMS_TRY_JAVA_DIR],
     AS_IF([test "$HAS_JDK" = no && test -d "$1"], 
       [
         $3
-        ONMS_VALIDATE_JDK([$1], [$2])
+        ONMS_VALIDATE_JDK([$1], [$2], [$4])
       ]
     )
   ]
@@ -94,8 +99,8 @@ AC_DEFUN([ONMS_VALIDATE_JDK],
     _ONMS_CHECK_FOR_JAR($1)   
     _ONMS_CHECK_FOR_JAVAH($1)
     _ONMS_CHECK_JAVA_VERSION($2)
+    _ONMS_CHECK_JAVA_ARCH($3)
     _ONMS_CHECK_FOR_JNI_HEADERS($1)
-
 
     AS_IF([test "$HAS_JDK" != yes], 
           [AC_MSG_NOTICE([no valid jdk found at $1])],
@@ -135,7 +140,7 @@ AC_DEFUN([_ONMS_CHECK_JAVA_VERSION],
       [
         HAS_VALID_JAVA_VERSION=yes
         AC_MSG_CHECKING([if java version meets requirements for $1])
-        _ONMS_CREATE_GETVER_SRC([getver])
+        _ONMS_CREATE_JAVA_SRC([getver], [System.out.println(System.getProperty("java.specification.version"));])
         _ONMS_COMPILE_SOURCE_FILE([getver.java], [tmp-classes], [])
         _JAVA_VERSION=`$JAVA -cp tmp-classes getver`
         rm -rf tmp-classes
@@ -147,7 +152,32 @@ AC_DEFUN([_ONMS_CHECK_JAVA_VERSION],
             HAS_JDK=no
           ]
         )
-        AC_MSG_RESULT([$HAS_VALID_JAVA_VERSION version is $_JAVA_VERSION])
+        AC_MSG_RESULT([$HAS_VALID_JAVA_VERSION, version is $_JAVA_VERSION])
+      ]
+    )
+  ]
+)
+
+AC_DEFUN([_ONMS_CHECK_JAVA_ARCH],
+  [
+    AS_IF([test "$HAS_JDK" = yes],
+      [
+        HAS_VALID_JAVA_ARCH=yes
+        AC_MSG_CHECKING([if java architecture meets requirements])
+        _ONMS_CREATE_JAVA_SRC([getarch], [System.out.println(System.getProperty("sun.arch.data.model"));])
+        _ONMS_COMPILE_SOURCE_FILE([getarch.java], [tmp-classes], [])
+        JAVA_ARCH=`$JAVA -cp tmp-classes getarch`
+        rm -rf tmp-classes
+        rm -f getarch.java
+
+        AS_IF([test "x$1" != "xnone" && test "$JAVA_ARCH" != "$1"],
+          [
+            HAS_VALID_JAVA_ARCH=no
+            HAS_JDK=no
+          ]
+        )
+        AC_MSG_RESULT([$HAS_VALID_JAVA_ARCH, $JAVA_ARCH-bit])
+	AC_SUBST(JAVA_ARCH)
       ]
     )
   ]
@@ -174,12 +204,12 @@ AC_DEFUN([_ONMS_COMPILE_SOURCE_FILE],
   ]
 )
 
-AC_DEFUN([_ONMS_CREATE_GETVER_SRC],
+AC_DEFUN([_ONMS_CREATE_JAVA_SRC],
   [
     cat > $1.java <<EOF
 class $1 {
   public static void main(String args@<:@@:>@) {
-    System.out.println(System.getProperty("java.specification.version"));
+    $2
   }
 }
 EOF
