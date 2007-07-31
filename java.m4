@@ -66,8 +66,9 @@ AC_DEFUN([ONMS_FIND_JDK],
 
     _ONMS_TRY_JAVA_DIR([/Library/Java/Home], [$1], [], [$2])
     _ONMS_TRY_JAVA_DIR([/usr/java/default], [$1], [], [$2])
+    _ONMS_TRY_JAVA_DIR([/usr/jdk/default], [$1], [], [$2])
 
-    for java_dir in /usr/java/*
+    for java_dir in /usr/jdk/* /usr/java/*
     do
       _ONMS_TRY_JAVA_DIR([$java_dir], [$1], [], [$2])
     done
