@@ -153,6 +153,7 @@ AC_DEFUN([_ONMS_CHECK_JAVA_VERSION],
             HAS_JDK=no
           ]
         )
+
         AC_MSG_RESULT([$HAS_VALID_JAVA_VERSION, version is $_JAVA_VERSION])
       ]
     )
@@ -173,8 +174,19 @@ AC_DEFUN([_ONMS_CHECK_JAVA_ARCH],
 
         AS_IF([test "x$1" != "xnone" && test "$JAVA_ARCH" != "$1"],
           [
-            HAS_VALID_JAVA_ARCH=no
-            HAS_JDK=no
+            AC_MSG_CHECKING([if java architecture meets requirements with -d$1])
+            _ONMS_CREATE_JAVA_SRC([getarch], [System.out.println(System.getProperty("sun.arch.data.model"));])
+            _ONMS_COMPILE_SOURCE_FILE([getarch.java], [tmp-classes], [])
+            JAVA_ARCH=`$JAVA -d$1 -cp tmp-classes getarch`
+            rm -rf tmp-classes
+            rm -f getarch.java
+
+            AS_IF([test "x$1" != "xnone" && test "$JAVA_ARCH" != "$1"],
+              [
+                HAS_VALID_JAVA_ARCH=no
+                HAS_JDK=no
+              ]
+            )
           ]
         )
         AC_MSG_RESULT([$HAS_VALID_JAVA_ARCH, $JAVA_ARCH-bit])
