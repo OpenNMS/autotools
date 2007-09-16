@@ -44,7 +44,7 @@ AC_DEFUN([ONMS_CHECK_IP_STRUCT_ENTRY],
 			],
 			[
 				AC_DEFINE(
-					AS_TR_CPP([IP_$1]),
+					AS_TR_CPP([ONMS_IP_$1]),
 					[$2],
 					[the $2 entry in the IP struct]
 				)
