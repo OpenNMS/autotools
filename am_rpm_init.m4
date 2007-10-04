@@ -191,6 +191,9 @@ AC_ARG_WITH(rpmbuild-prog,[  --with-rpmbuild-prog=PROG   Which rpm to use (optio
 AC_ARG_ENABLE(rpm-rules, [  --enable-rpm-rules       Try to create rpm make rules (defaults to yes)],
                 enable_rpm_rules="$withval",enable_rpm_rules=yes)
 
+AC_ARG_WITH(rpm-arch, [  --with-rpm-arch=ARCH     Use the given architecture to build (defaults to auto)],
+                rpmarch="$withval",rpmarch="auto")
+
 AC_ARG_WITH(rpm-extra-args, [  --with-rpm-extra-args=ARGS       Run rpm with extra arguments (defaults to none)],
                 rpm_extra_args="$withval", rpm_extra_args="")
 
@@ -204,6 +207,16 @@ AC_ARG_WITH(rpm-extra-args, [  --with-rpm-extra-args=ARGS       Run rpm with ext
        if test x${RPMBUILD_PROG+set} != xset ; then
           RPMBUILD_PROG=$rpmbuild_prog
        fi
+    fi
+
+    if test x$rpmarch = xauto; then
+      if test x${RPM_ARCH+set} != xset ; then
+        RPM_ARCH=`rpm --eval '%{_arch}'`
+      fi
+    elif test x${rpmarch+set} = xset ; then
+      RPM_ARCH=$rpmarch
+    else
+      RPM_ARCH=`rpm --eval '%{_arch}'`
     fi
 
     AC_PATH_PROG(RPMBUILD_PROG, rpmbuild, no)
@@ -230,13 +243,12 @@ echo *** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=P
         AC_MSG_RESULT([$rpmdir])
       fi
       AC_MSG_CHECKING(how rpm sets %{_rpmfilename})
-      rpmarch=`rpm --eval '%{_arch}'`
-      rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed "s/%{ARCH}/$rpmarch/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RELEASE}/g"`
+      rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed "s/%{ARCH}/$RPM_ARCH/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RELEASE}/g"`
       AC_MSG_RESULT([$rpmfilename])
 
       RPM_DIR="${rpmdir}"
       RPM_TARGET="$rpmfilename"
-      RPM_ARGS="-ta $rpm_extra_args"
+      RPM_ARGS="-ta --target=$RPM_ARCH $rpm_extra_args"
       RPM_TARBALL="${PACKAGE}-${VERSION}.tar.gz"
     fi
   fi
@@ -251,6 +263,7 @@ echo *** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=P
   AC_SUBST(RPM_TARGET)
   AC_SUBST(RPM_ARGS)
   AC_SUBST(RPM_TARBALL)
+  AC_SUBST(RPM_ARCH)
 
   RPM_CONFIGURE_ARGS=${ac_configure_args}
   AC_SUBST(RPM_CONFIGURE_ARGS)

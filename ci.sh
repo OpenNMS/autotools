@@ -19,6 +19,7 @@ BUILDNUM="$1"; shift
 [ -n "$REVISION" ] || die "you must specify the SVN revision"
 [ -n "$BUILDNUM" ] || die "you must specify the build number"
 
+RPM_ARCH=""
 RPM_ARGS=""
 HOST_ARGS=""
 
@@ -27,19 +28,20 @@ MACHINE=`uname -m`
 
 if [ "$OS" = "linux" ]; then
 	if [ "$BITS" = "64" ]; then
-		RPM_ARGS="--with-rpm-extra-args=--target x86_64"
 		HOST_ARGS="--host=x86_64-$OS"
+		RPM_ARCH="--with-rpm-arch=x86_64"
 	else
-		RPM_ARGS="--with-rpm-extra-args=--target $MACHINE"
-		HOST_ARGS="--host=$MACHINE-$OS"
+		HOST_ARGS="--host=i386-$OS"
+		RPM_ARCH="--with-rpm-arch=i386"
 	fi
 fi
 
-sh m4/autogen.sh
-./configure --prefix=/usr --with-java="${JAVA_HOME}" --with-jvm-arch=$BITS "$RPM_ARGS" "$HOST_ARGS"
+sh m4/autogen.sh || die "failed to autogen"
+./configure --prefix=/usr --with-java="${JAVA_HOME}" --with-jvm-arch=$BITS "$RPM_ARCH" "$RPM_ARGS" "$HOST_ARGS" || die "failed to configure"
 if [ -x /bin/rpm ]; then
-	make rpm RELEASE="0.${REVISION}.${BUILDNUM}"
+	make rpm RELEASE="0.${REVISION}.${BUILDNUM}" || die "failed to make an RPM"
 else
-	make
+	make || die "failed to run make"
+	make install DESTDIR=`pwd`/dist || die "failed to run make install"
+	rm -rf dist
 fi
-make install DESTDIR=`pwd`/dist
