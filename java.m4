@@ -26,6 +26,10 @@ AC_DEFUN([ONMS_CHECK_JDK],
         darwin*)
             JAVA_SHREXT_COMMAND="-shrext .jnilib"
             ;;
+        mingw*)
+            JAVA_SHREXT_COMMAND="-Wl,--kill-at"
+            JNI_INCLUDES="$JNI_INCLUDES -D_JNI_IMPLEMENTATION_"
+            ;;
     esac
 
     AC_SUBST([JAVA_SHREXT_COMMAND])
