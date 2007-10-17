@@ -1,6 +1,61 @@
+AC_DEFUN([_ONMS_FIND_IP_HEADERS], [
+	if test -z "$_ONMS_TESTED_IP_HEADERS"; then
+		AC_CHECK_HEADERS([sys/types.h netinet/in.h netinet/in_systm.h netinet/ip_icmp.h winsock2.h ws2tcpip.h win32/icmp.h])
+		_ONMS_TESTED_IP_HEADERS=yes
+	fi
+])
+
+AC_DEFUN([_ONMS_TRY_COMPILE], [
+		_ONMS_FIND_IP_HEADERS
+		AC_TRY_COMPILE(
+			[
+				#ifdef HAVE_SYS_TYPES_H
+				#include <sys/types.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IN_H
+				#include <netinet/in.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IN_SYSTM_H
+				#include <netinet/in_systm.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IP_H
+				#include <netinet/ip.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IP_ICMP_H
+				#include <netinet/ip_icmp.h>
+				#endif
+
+				#ifdef HAVE_WINSOCK2_H
+				#include <winsock2.h>
+				#endif
+
+				#ifdef HAVE_WS2TCPIP_H
+				#include <ws2tcpip.h>
+				#endif
+
+				#ifdef __WIN32__
+				#ifdef HAVE_WIN32_ICMP_H
+				#include "win32/icmp.h"
+				#endif
+				#endif
+
+				$1
+			],
+			[ $2 ],
+			[ $3 ],
+			[ $4 ]
+		)
+	]
+)
+
 dnl check for a struct based on the first argument
 AC_DEFUN([ONMS_CHECK_IP_STRUCT],
 	[
+		_ONMS_FIND_IP_HEADERS
 		AC_CHECK_TYPE(
 			[struct $1],
 			[
@@ -12,10 +67,40 @@ AC_DEFUN([ONMS_CHECK_IP_STRUCT],
 			],
 			[],
 			[
+				#ifdef HAVE_SYS_TYPES_H
 				#include <sys/types.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IN_H
 				#include <netinet/in.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IN_SYSTM_H
 				#include <netinet/in_systm.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IP_H
 				#include <netinet/ip.h>
+				#endif
+
+				#ifdef HAVE_NETINET_IP_ICMP_H
+				#include <netinet/ip_icmp.h>
+				#endif
+
+				#ifdef HAVE_WINSOCK2_H
+				#include <winsock2.h>
+				#endif
+
+				#ifdef HAVE_WS2TCPIP_H
+				#include <ws2tcpip.h>
+				#endif
+
+				#ifdef __WIN32__
+				#ifdef HAVE_WIN32_ICMP_H
+				#include "win32/icmp.h"
+				#endif
+				#endif
+
 				$2
 			]
 		)
@@ -26,13 +111,8 @@ dnl check for an entry in the IP struct
 AC_DEFUN([ONMS_CHECK_IP_STRUCT_ENTRY],
 	[
 		AC_MSG_CHECKING([for ip->$2])
-		AC_TRY_COMPILE(
-			[
-				#include <sys/types.h>
-				#include <netinet/in.h>
-				#include <netinet/in_systm.h>
-				#include <netinet/ip.h>
-			],
+		_ONMS_TRY_COMPILE(
+			[],
 			[
 				#if defined(HAVE_STRUCT_IP)
 				struct ip ip;
@@ -59,14 +139,8 @@ dnl check for an entry in the ICMP struct
 AC_DEFUN([ONMS_CHECK_ICMP_STRUCT_ENTRY],
 	[
 		AC_MSG_CHECKING([for icmp->$2])
-		AC_TRY_COMPILE(
-			[
-				#include <sys/types.h>
-				#include <netinet/in.h>
-				#include <netinet/in_systm.h>
-				#include <netinet/ip.h>
-				#include <netinet/ip_icmp.h>
-			],
+		_ONMS_TRY_COMPILE(
+			[],
 			[
 				#if defined(HAVE_STRUCT_ICMP)
 				struct icmp icmp;
@@ -88,4 +162,3 @@ AC_DEFUN([ONMS_CHECK_ICMP_STRUCT_ENTRY],
 		)
 	]
 )
-

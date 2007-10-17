@@ -5,13 +5,27 @@ dnl ****************************************
 dnl Check for the type of the third argument of getsockname
 AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 [
+	AC_CHECK_HEADERS([sys/types.h sys/socket.h winsock2.h ws2tcpip.h])
 	AC_MSG_CHECKING(for socklen_t)
 	AC_CACHE_VAL(onms_cv_socklen_t,
 	[
 		onms_cv_socklen_t=no
 		AC_TRY_COMPILE([
+			#ifdef HAVE_SYS_TYPES_H
 			#include <sys/types.h>
+			#endif
+
+			#ifdef HAVE_SYS_SOCKET_H
 			#include <sys/socket.h>
+			#endif
+
+			#ifdef HAVE_WINSOCK2_H
+			#include <winsock2.h>
+			#endif
+
+			#ifdef HAVE_WS2TCPIP_H
+			#include <ws2tcpip.h>
+			#endif
 		],
 		[
 			socklen_t len;
@@ -30,8 +44,21 @@ AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 			onms_cv_socklen_t_equiv=int
 			for t in int size_t unsigned long "unsigned long"; do
 				AC_TRY_COMPILE([
+					#ifdef HAVE_SYS_TYPES_H
 					#include <sys/types.h>
+					#endif
+		
+					#ifdef HAVE_SYS_SOCKET_H
 					#include <sys/socket.h>
+					#endif
+		
+					#ifdef HAVE_WINSOCK2_H
+					#include <winsock2.h>
+					#endif
+		
+					#ifdef HAVE_WS2TCPIP_H
+					#include <ws2tcpip.h>
+					#endif
 				],
 				[
 					$t len;
