@@ -38,6 +38,7 @@ fi
 
 sh m4/autogen.sh || die "failed to autogen"
 ./configure --prefix=/usr --with-java="${JAVA_HOME}" --with-jvm-arch=$BITS "$RPM_ARCH" "$RPM_ARGS" "$HOST_ARGS" || die "failed to configure"
+make dist
 if [ -x /bin/rpm ]; then
 	make rpm RELEASE="0.${REVISION}.${BUILDNUM}" || die "failed to make an RPM"
 else
