@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -v
 
 usage() {
 	echo "usage: $0 <bittedness> <SVN revision> <build number>"
