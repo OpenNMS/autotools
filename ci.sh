@@ -28,17 +28,20 @@ MACHINE=`uname -m`
 
 if [ "$OS" = "linux" ]; then
 	if [ "$BITS" = "64" ]; then
-		HOST_ARGS="--host=x86_64-$OS"
+		# HOST_ARGS="--host=x86_64-$OS"
+		HOST_ARGS="--target=x86_64-$OS"
 		RPM_ARCH="--with-rpm-arch=x86_64"
 	else
-		HOST_ARGS="--host=i386-$OS"
+		# HOST_ARGS="--host=i386-$OS"
+		HOST_ARGS="--target=i386-$OS"
 		RPM_ARCH="--with-rpm-arch=i386"
 	fi
 fi
 
 sh m4/autogen.sh || die "failed to autogen"
 ./configure --prefix=/usr --with-java="${JAVA_HOME}" --with-jvm-arch=$BITS "$RPM_ARCH" "$RPM_ARGS" "$HOST_ARGS" || die "failed to configure"
-make dist
+make distclean || :
+make dist || die "unable to make dist"
 if [ -x /bin/rpm ]; then
 	make rpm RELEASE="0.${REVISION}.${BUILDNUM}" || die "failed to make an RPM"
 else

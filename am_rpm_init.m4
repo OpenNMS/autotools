@@ -243,13 +243,13 @@ echo *** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=P
         AC_MSG_RESULT([$rpmdir])
       fi
       AC_MSG_CHECKING(how rpm sets %{_rpmfilename})
-      rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed "s/%{ARCH}/$RPM_ARCH/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RELEASE}/g"`
+      rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/%{ARCH}/$(RPM_ARCH)/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
       AC_MSG_RESULT([$rpmfilename])
 
       RPM_DIR="${rpmdir}"
       RPM_TARGET="$rpmfilename"
       RPM_ARGS="-ta --target=$RPM_ARCH $rpm_extra_args"
-      RPM_TARBALL="${PACKAGE}-${VERSION}.tar.gz"
+      RPM_TARBALL='$(PACKAGE)-$(VERSION).tar.gz'
     fi
   fi
 
