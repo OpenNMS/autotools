@@ -222,9 +222,9 @@ AC_ARG_WITH(rpm-extra-args, [  --with-rpm-extra-args=ARGS       Run rpm with ext
     AC_PATH_PROG(RPMBUILD_PROG, rpmbuild, no)
     no_rpm=no
     if test "$RPMBUILD_PROG" = "no" ; then
-echo *** RPM Configuration Failed
-echo *** Failed to find the rpmbuild program.  If you want to build rpm packages
-echo *** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=PROG
+echo "*** RPM Configuration Failed"
+echo "*** Failed to find the rpmbuild program.  If you want to build rpm packages"
+echo "*** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=PROG"
       no_rpm=yes
       RPM_MAKE_RULES=""
     else
@@ -232,13 +232,13 @@ echo *** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=P
       rpmdir=`rpm --eval '%{_rpmdir}'`
       if test x$rpmdir = x'%{_rpmdir}' ; then
         AC_MSG_RESULT([not set (cannot build rpms?)])
-        echo *** Could not determine the value of %{_rpmdir}
-        echo *** This could be because it is not set, or your version of rpm does not set it
-        echo *** It must be set in order to generate the correct rpm generation commands
-        echo ***
-        echo *** You might still be able to create rpms, but I could not automate it for you
-        echo *** BTW, if you know this is wrong, please help to improve the rpm.m4 module
-        echo *** Send corrections, updates and fixes to dhawkins@cdrgts.com.  Thanks.
+        echo "*** Could not determine the value of %{_rpmdir}"
+        echo "*** This could be because it is not set, or your version of rpm does not set it"
+        echo "*** It must be set in order to generate the correct rpm generation commands"
+        echo "***"
+        echo "*** You might still be able to create rpms, but I could not automate it for you"
+        echo "*** BTW, if you know this is wrong, please help to improve the rpm.m4 module"
+        echo "*** Send corrections, updates and fixes to dhawkins@cdrgts.com.  Thanks."
       else
         AC_MSG_RESULT([$rpmdir])
       fi
