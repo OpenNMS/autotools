@@ -33,7 +33,7 @@ AC_DEFUN([ONMS_SET_CC_WARNING_CFLAGS],
     AS_IF([test "x$HAS_SUNCC" = "x"], [AC_MSG_ERROR([HAS_SUNCC is not set])])
 
     if test "x$GCC" = "xyes"; then
-      CFLAGS="$CFLAGS -Wall -Werror"
+      CFLAGS="$CFLAGS -Wall"
     elif test "x$HAS_SUNCC" = "xyes"; then
       CFLAGS="$CFLAGS -errwarn=%all"
     else
