@@ -147,7 +147,7 @@ AC_DEFUN([_ONMS_CHECK_JAVA_VERSION],
         AC_MSG_CHECKING([if java version meets requirements for $1])
         _ONMS_CREATE_JAVA_SRC([getver], [System.out.println(System.getProperty("java.specification.version"));])
         _ONMS_COMPILE_SOURCE_FILE([getver.java], [tmp-classes], [])
-        _JAVA_VERSION=`$JAVA -cp tmp-classes getver`
+        _JAVA_VERSION=`"$JAVA" -cp tmp-classes getver`
         rm -rf tmp-classes
         rm -f getver.java
 
@@ -172,7 +172,7 @@ AC_DEFUN([_ONMS_CHECK_JAVA_ARCH],
         AC_MSG_CHECKING([if java architecture meets requirements])
         _ONMS_CREATE_JAVA_SRC([getarch], [System.out.println(System.getProperty("sun.arch.data.model", "32"));])
         _ONMS_COMPILE_SOURCE_FILE([getarch.java], [tmp-classes], [])
-        JAVA_ARCH=`$JAVA -cp tmp-classes getarch`
+        JAVA_ARCH=`"$JAVA" -cp tmp-classes getarch`
         rm -rf tmp-classes
         rm -f getarch.java
 
@@ -181,7 +181,7 @@ AC_DEFUN([_ONMS_CHECK_JAVA_ARCH],
             AC_MSG_CHECKING([if java architecture meets requirements with -d$1])
             _ONMS_CREATE_JAVA_SRC([getarch], [System.out.println(System.getProperty("sun.arch.data.model", "32"));])
             _ONMS_COMPILE_SOURCE_FILE([getarch.java], [tmp-classes], [])
-            JAVA_ARCH=`$JAVA -d$1 -cp tmp-classes getarch`
+            JAVA_ARCH=`"$JAVA" -d$1 -cp tmp-classes getarch`
             rm -rf tmp-classes
             rm -f getarch.java
 
@@ -215,7 +215,7 @@ AC_DEFUN([_ONMS_COMPILE_SOURCE_FILE],
       ]
     )
 
-    $JAVAC $_JVC_FLAGS "$1"
+    "$JAVAC" $_JVC_FLAGS "$1"
 
     AS_UNSET([_JVC_FLAGS])
   ]
