@@ -9,8 +9,8 @@
 
 [ -x "`which libtoolize 2>/dev/null`" ] && LIBTOOLIZE=libtoolize
 
-$AUTOHEADER --force
-$LIBTOOLIZE --automake --copy --force
 $ACLOCAL --force -I m4
-$AUTOMAKE --add-missing --copy
+$LIBTOOLIZE --automake --copy --force
 $AUTOCONF --force
+$AUTOHEADER --force
+$AUTOMAKE --add-missing --copy --force-missing
