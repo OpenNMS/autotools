@@ -138,7 +138,7 @@ AC_DEFUN([_ONMS_CHECK_FOR_JNI_HEADERS],
         HAS_JNI_HEADERS=yes
         AS_IF([test -d "$1/include" && test -f "$1/include/jni.h"],
           [
-            JNI_INCLUDES=`find "$1/include" -type d | while read DIR; do
+            JNI_INCLUDES=`printf -- "-I$1/include "; find "$1/include/*" -type d | while read DIR; do
                printf -- "-I\$DIR "
             done`
           ],
