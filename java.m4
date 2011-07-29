@@ -68,17 +68,18 @@ AC_DEFUN([ONMS_FIND_JDK],
       ]
     )
 
-    _ONMS_TRY_JAVA_DIR([/Library/Java/Home], [$1], [], [$2])
-    _ONMS_TRY_JAVA_DIR([/usr/java/default], [$1], [], [$2])
-    _ONMS_TRY_JAVA_DIR([/usr/jdk/default], [$1], [], [$2])
-
-    for java_dir in /usr/jdk/* /usr/java/* /Library/Java/JavaVirtualMachines/*/Contents/Home
+    for java_dir in \
+      /usr/java/default \
+      /usr/jdk/default \
+      /usr/jdk/* \
+      /usr/java/* \
+      /System/Library/Java/JavaVirtualMachines/*/Contents/Home \
+      /Library/Java/JavaVirtualMachines/*/Contents/Home \
+      /Library/Java/Home \
+      /usr/local/java
     do
       _ONMS_TRY_JAVA_DIR([$java_dir], [$1], [], [$2])
     done
-
-    _ONMS_TRY_JAVA_DIR([/usr/local/java], [$1], [], [$2])
-    
   ]
 )
 
@@ -136,9 +137,18 @@ AC_DEFUN([_ONMS_CHECK_FOR_JNI_HEADERS],
       [
         AC_MSG_CHECKING([for jni headers])
         HAS_JNI_HEADERS=yes
-        AS_IF([test -d "$1/include" && test -f "$1/include/jni.h"],
+        case $host_os in
+          darwin*)
+            JNI_PATH="/System/Library/Frameworks/JavaVM.framework/Headers"
+            ;;
+          *)
+            JNI_PATH="$1/include"
+            ;;
+        esac
+
+        AS_IF([test -e "$JNI_PATH" && test -f "$JNI_PATH/jni.h"],
           [
-            JNI_INCLUDES=`printf -- "-I$1/include "; find "$1/include"/* -type d | while read DIR; do
+            JNI_INCLUDES=`printf -- "-I$JNI_PATH "; find "$JNI_PATH"/* -type d | while read DIR; do
                printf -- "-I\$DIR "
             done`
           ],
