@@ -1,8 +1,12 @@
 AC_DEFUN([_ONMS_FIND_IP_HEADERS], [
 	if test -z "$_ONMS_TESTED_IP_HEADERS"; then
-		AC_CHECK_HEADERS([sys/types.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h netinet/icmp6.h winsock2.h ws2tcpip.h win32/icmp.h], [], [], [
+		AC_CHECK_HEADERS([sys/types.h sys/socket.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h netinet/icmp6.h winsock2.h ws2tcpip.h win32/icmp.h], [], [], [
 			#ifdef HAVE_SYS_TYPES_H
 			#include <sys/types.h>
+			#endif
+
+			#ifdef HAVE_SYS_SOCKET_H
+			#include <sys/socket.h>
 			#endif
 
 			#ifdef HAVE_WINSOCK2_H
@@ -43,6 +47,10 @@ AC_DEFUN([_ONMS_TRY_COMPILE], [
 			[
 				#ifdef HAVE_SYS_TYPES_H
 				#include <sys/types.h>
+				#endif
+
+				#ifdef HAVE_SYS_SOCKET_H
+				#include <sys/socket.h>
 				#endif
 
 				#ifdef HAVE_NETINET_IN_H
@@ -101,6 +109,10 @@ AC_DEFUN([ONMS_CHECK_IP_STRUCT],
 			[
 				#ifdef HAVE_SYS_TYPES_H
 				#include <sys/types.h>
+				#endif
+
+				#ifdef HAVE_SYS_SOCKET_H
+				#include <sys/socket.h>
 				#endif
 
 				#ifdef HAVE_NETINET_IN_H
