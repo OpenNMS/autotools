@@ -4,7 +4,11 @@ AC_DEFUN([ONMS_SET_CC_ARCH_CFLAGS],
     AS_IF([test "x$HAS_SUNCC" = "x"], [AC_MSG_ERROR([HAS_SUNCC is not set])])
 
     if test "x$GCC" = "xyes"; then
-      CFLAGS="$CFLAGS -m$JAVA_ARCH"
+      case $host_cpu in
+        i*86|x86_64)
+          CFLAGS="$CFLAGS -m$JAVA_ARCH"
+          ;;
+      esac
     elif test "x$HAS_SUNCC" = "xyes"; then
       case "${JAVA_ARCH}" in
         32)
