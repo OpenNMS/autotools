@@ -1,6 +1,6 @@
 AC_DEFUN([ONMS_RRD_HOME_FROM_RRDTOOL],
   [
-    AC_PATH_PROG([RRDTOOL], [rrdtool])
+    AC_CHECK_PROGS([RRDTOOL], [rrdtool opennms-rrdtool])
     AS_IF([test "x$RRDTOOL" != "x"],
      [
        rrdbindir=`AS_DIRNAME("$RRDTOOL")`
