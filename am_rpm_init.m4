@@ -38,19 +38,26 @@
 #   Changes to Makefile.am (I am trying to get rid of this step;
 #   suggestions invited):
 #
-#     if MAKE_RPMS
+#   if MAKE_RPMS
 #     rpm: @RPM_TARGET@
 #
-#     .PHONY: rpm
+#     srpm: @SRPM_TARGET@
+#
+#     .PHONY: rpm srpm
 #
 #     $(RPM_TARGET): $(DISTFILES)
 #       ${MAKE} dist
-#       -mkdir -p $(RPM_DIR)/SRPMS
+#       -mkdir -p $(SRPM_DIR)
 #       -mkdir -p `dirname $(RPM_TARGET)`
-#       $(RPMBUILD_PROG) $(RPM_ARGS) $(RPM_TARBALL)
-#       @echo Congratulations, $(RPM_TARGET) "(and friends)" should now exist.
-#     else
-#     endif
+#       $(RPMBUILD_PROG) --define 'version $(VERSION)' --define 'rel $(RELEASE)' $(RPM_ARGS) $(RPM_TARBALL)
+#       @echo "$(RPM_TARGET) created"
+#
+#     $(SRPM_TARGET): $(DISTFILES)
+#       ${MAKE} dist
+#       -mkdir -p $(SRPM_DIR)
+#       $(RPMBUILD_PROG) --define 'version $(VERSION)' --define 'rel $(RELEASE)' $(SRPM_ARGS) $(RPM_TARBALL)
+#       @echo "$(SRPM_TARGET) created"
+#   endif
 #
 #   Also, it works best with a XXXX.spec.in file like the following
 #   (this is way down on the wishlist, but a program to generate the
@@ -242,14 +249,31 @@ echo "*** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=
       else
         AC_MSG_RESULT([$rpmdir])
       fi
-      AC_MSG_CHECKING(how rpm sets %{_rpmfilename})
+      AC_MSG_CHECKING(how rpm sets %{_srcrpmdir})
+      srcrpmdir=`rpm --eval '%{_srcrpmdir}'`
+      if test x$srcrpmdir = x'%{_srcrpmdir}' ; then
+        AC_MSG_RESULT([not set (cannot build rpms?)])
+        echo "*** Could not determine the value of %{_srcrpmdir}"
+        echo "*** This could be because it is not set, or your version of rpm does not set it"
+        echo "*** It must be set in order to generate the correct rpm generation commands"
+        echo "***"
+        echo "*** You might still be able to create rpms, but I could not automate it for you"
+        echo "*** BTW, if you know this is wrong, please help to improve the rpm.m4 module"
+        echo "*** Send corrections, updates and fixes to dhawkins@cdrgts.com.  Thanks."
+      else
+        AC_MSG_RESULT([$srcrpmdir])
+      fi
+      AC_MSG_CHECKING(where RPMs end up)
       rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/%{ARCH}/$(RPM_ARCH)/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
-      srpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/%{ARCH}/src/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
       AC_MSG_RESULT([$rpmfilename])
+      AC_MSG_CHECKING(where source RPMs end up)
+      srcrpmfilename=$srcrpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/^%{ARCH}\///g' -e 's/%{ARCH}/src/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
+      AC_MSG_RESULT([$srcrpmfilename])
 
       RPM_DIR="${rpmdir}"
+      SRPM_DIR="${srcrpmdir}"
       RPM_TARGET="${rpmfilename}"
-      SRPM_TARGET="${srpmfilename}"
+      SRPM_TARGET="${srcrpmfilename}"
       RPM_ARGS="-ta --target=${RPM_ARCH} ${rpm_extra_args}"
       SRPM_ARGS="-ts ${rpm_extra_args}"
       RPM_TARBALL='$(PACKAGE)-$(VERSION).tar.gz'
