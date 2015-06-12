@@ -244,11 +244,14 @@ echo "*** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=
       fi
       AC_MSG_CHECKING(how rpm sets %{_rpmfilename})
       rpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/%{ARCH}/$(RPM_ARCH)/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
+      srpmfilename=$rpmdir/`rpm --eval '%{_rpmfilename}' | sed -e 's/%{ARCH}/src/g' -e 's/%{NAME}/$(PACKAGE)/g' -e 's/%{VERSION}/$(VERSION)/g' -e 's/%{RELEASE}/$(RELEASE)/g'`
       AC_MSG_RESULT([$rpmfilename])
 
       RPM_DIR="${rpmdir}"
-      RPM_TARGET="$rpmfilename"
-      RPM_ARGS="-ta --target=$RPM_ARCH $rpm_extra_args"
+      RPM_TARGET="${rpmfilename}"
+      SRPM_TARGET="${srpmfilename}"
+      RPM_ARGS="-ta --target=${RPM_ARCH} ${rpm_extra_args}"
+      SRPM_ARGS="-ts ${rpm_extra_args}"
       RPM_TARBALL='$(PACKAGE)-$(VERSION).tar.gz'
     fi
   fi
@@ -261,7 +264,9 @@ echo "*** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=
   esac
   AC_SUBST(RPM_DIR)
   AC_SUBST(RPM_TARGET)
+  AC_SUBST(SRPM_TARGET)
   AC_SUBST(RPM_ARGS)
+  AC_SUBST(SRPM_ARGS)
   AC_SUBST(RPM_TARBALL)
   AC_SUBST(RPM_ARCH)
 
