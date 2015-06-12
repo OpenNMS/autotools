@@ -287,6 +287,7 @@ echo "*** indicate the path to the rpmbuild program using  --with-rpmbuild-prog=
        make_rpms=false;;
   esac
   AC_SUBST(RPM_DIR)
+  AC_SUBST(SRPM_DIR)
   AC_SUBST(RPM_TARGET)
   AC_SUBST(SRPM_TARGET)
   AC_SUBST(RPM_ARGS)
