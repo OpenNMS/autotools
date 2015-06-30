@@ -73,6 +73,7 @@ AC_DEFUN([ONMS_FIND_JDK],
       /usr/jdk/default \
       /usr/jdk/* \
       /usr/java/* \
+      /usr/lib/jvm/* \
       /System/Library/Java/JavaVirtualMachines/*/Contents/Home \
       /Library/Java/JavaVirtualMachines/*/Contents/Home \
       /Library/Java/Home \
