@@ -22,9 +22,11 @@ AC_DEFUN([ONMS_CHECK_JDK],
 
     AC_MSG_NOTICE([using JDK at $JAVA_HOME])
 
+    JNI_LIB_EXTENSION=".so"
     case $host_os in
         darwin*)
             JAVA_SHREXT_COMMAND="-shrext .jnilib"
+            JNI_LIB_EXTENSION=".jnilib"
             ;;
         mingw*)
             JAVA_SHREXT_COMMAND="-Wl,--kill-at"
