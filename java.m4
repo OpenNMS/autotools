@@ -140,15 +140,7 @@ AC_DEFUN([_ONMS_CHECK_FOR_JNI_HEADERS],
       [
         AC_MSG_CHECKING([for jni headers])
         HAS_JNI_HEADERS=yes
-        case $host_os in
-          darwin*)
-            JNI_PATH="/System/Library/Frameworks/JavaVM.framework/Headers"
-            ;;
-          *)
-            JNI_PATH="$1/include"
-            ;;
-        esac
-
+        JNI_PATH="$1/include"
         AS_IF([test -e "$JNI_PATH" && test -f "$JNI_PATH/jni.h"],
           [
             JNI_INCLUDES=`printf -- "-I$JNI_PATH "; find "$JNI_PATH"/* -type d | while read DIR; do
