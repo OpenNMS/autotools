@@ -10,7 +10,7 @@ AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 	AC_CACHE_VAL(onms_cv_socklen_t,
 	[
 		onms_cv_socklen_t=no
-		AC_TRY_COMPILE([
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 			#ifdef HAVE_SYS_TYPES_H
 			#include <sys/types.h>
 			#endif
@@ -26,15 +26,13 @@ AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 			#ifdef HAVE_WS2TCPIP_H
 			#include <ws2tcpip.h>
 			#endif
-		],
-		[
+		]], [[
 			socklen_t len;
 			getpeername(0,0,&len);
-		],
-		[
+		]])],[
 			onms_cv_socklen_t=yes
 			onms_cv_socklen_t_equiv=socklen_t
-		])
+		],[])
 	])
 	AC_MSG_RESULT($onms_cv_socklen_t)
 	if test $onms_cv_socklen_t = no; then
@@ -43,7 +41,7 @@ AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 		[
 			onms_cv_socklen_t_equiv=int
 			for t in int size_t unsigned long "unsigned long"; do
-				AC_TRY_COMPILE([
+				AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 					#ifdef HAVE_SYS_TYPES_H
 					#include <sys/types.h>
 					#endif
@@ -59,15 +57,13 @@ AC_DEFUN([ONMS_CHECK_SOCKLEN_T],
 					#ifdef HAVE_WS2TCPIP_H
 					#include <ws2tcpip.h>
 					#endif
-				],
-				[
+				]], [[
 					$t len;
 					getpeername(0,0,&len);
-				],
-				[
+				]])],[
 					onms_cv_socklen_t_equiv="$t"
 					break
-				])
+				],[])
 			done
 		])
 		AC_MSG_RESULT($onms_cv_socklen_t_equiv)

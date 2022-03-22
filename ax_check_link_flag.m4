@@ -58,7 +58,7 @@
 #serial 5
 
 AC_DEFUN([AX_CHECK_LINK_FLAG],
-[AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_IF
+[AC_PREREQ([2.64])dnl for _AC_LANG_PREFIX and AS_VAR_IF
 AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_ldflags_$4_$1])dnl
 AC_CACHE_CHECK([whether the linker accepts $1], CACHEVAR, [
   ax_check_save_flags=$LDFLAGS

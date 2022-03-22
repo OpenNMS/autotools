@@ -43,49 +43,51 @@ AC_DEFUN([_ONMS_FIND_IP_HEADERS], [
 
 AC_DEFUN([_ONMS_TRY_COMPILE], [
 		_ONMS_FIND_IP_HEADERS
-		AC_TRY_COMPILE(
-			[
-				#ifdef HAVE_SYS_TYPES_H
-				#include <sys/types.h>
-				#endif
+		AC_COMPILE_IFELSE(
+			[AC_LANG_PROGRAM(
+				[[
+					#ifdef HAVE_SYS_TYPES_H
+					#include <sys/types.h>
+					#endif
 
-				#ifdef HAVE_SYS_SOCKET_H
-				#include <sys/socket.h>
-				#endif
+					#ifdef HAVE_SYS_SOCKET_H
+					#include <sys/socket.h>
+					#endif
 
-				#ifdef HAVE_NETINET_IN_H
-				#include <netinet/in.h>
-				#endif
+					#ifdef HAVE_NETINET_IN_H
+					#include <netinet/in.h>
+					#endif
 
-				#ifdef HAVE_NETINET_IN_SYSTM_H
-				#include <netinet/in_systm.h>
-				#endif
+					#ifdef HAVE_NETINET_IN_SYSTM_H
+					#include <netinet/in_systm.h>
+					#endif
 
-				#ifdef HAVE_NETINET_IP_H
-				#include <netinet/ip.h>
-				#endif
+					#ifdef HAVE_NETINET_IP_H
+					#include <netinet/ip.h>
+					#endif
 
-				#ifdef HAVE_NETINET_IP_ICMP_H
-				#include <netinet/ip_icmp.h>
-				#endif
+					#ifdef HAVE_NETINET_IP_ICMP_H
+					#include <netinet/ip_icmp.h>
+					#endif
 
-				#ifdef HAVE_WINSOCK2_H
-				#include <winsock2.h>
-				#endif
+					#ifdef HAVE_WINSOCK2_H
+					#include <winsock2.h>
+					#endif
 
-				#ifdef HAVE_WS2TCPIP_H
-				#include <ws2tcpip.h>
-				#endif
+					#ifdef HAVE_WS2TCPIP_H
+					#include <ws2tcpip.h>
+					#endif
 
-				#ifdef __WIN32__
-				#ifdef HAVE_WIN32_ICMP_H
-				#include "win32/icmp.h"
-				#endif
-				#endif
+					#ifdef __WIN32__
+					#ifdef HAVE_WIN32_ICMP_H
+					#include "win32/icmp.h"
+					#endif
+					#endif
 
-				$1
-			],
-			[ $2 ],
+					$1
+				]],
+				[[ $2 ]]
+			)],
 			[ $3 ],
 			[ $4 ]
 		)
@@ -163,7 +165,7 @@ AC_DEFUN([ONMS_CHECK_IP_STRUCT_ENTRY],
 				#elif defined(HAVE_STRUCT_IPHDR)
 				struct iphdr ip;
 				#endif
-			
+
 				ip.$2 = 0;
 			],
 			[
@@ -191,7 +193,7 @@ AC_DEFUN([ONMS_CHECK_ICMP_STRUCT_ENTRY],
 				#elif defined(HAVE_STRUCT_ICMPHDR)
 				struct icmphdr icmp;
 				#endif
-			
+
 				icmp.$2 = 0;
 			],
 			[
