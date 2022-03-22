@@ -10,15 +10,17 @@ AC_DEFUN([ONMS_CHECK_JDK],
       [],
       [with_jvm_arch=none])
 
+    JAVA_TARGET_VERSION="$1"
+
     AS_IF([test "x$with_java" = "xno"], [AC_MSG_ERROR([the path to a JDK is required to build jrrd])])
     AS_IF([test "x$with_java" = "xyes"], [AC_MSG_ERROR([the argument to --with-java must specify a JDK])])
     AS_IF([test "x$with_java" = "xcheck"], 
-          [ONMS_FIND_JDK([$1], [$with_jvm_arch])],
-          [ONMS_VALIDATE_JDK([$with_java], [$1], [$with_jvm_arch])]
+          [ONMS_FIND_JDK([$JAVA_TARGET_VERSION], [$with_jvm_arch])],
+          [ONMS_VALIDATE_JDK([$with_java], [$JAVA_TARGET_VERSION], [$with_jvm_arch])]
     )
 
     AS_IF([test "x$HAS_JDK" = "x" || test "$HAS_JDK" = "false" || test "$HAS_JDK" = "no"],
-          [AC_MSG_ERROR([unable to find a valid JDK for java version $1])])
+          [AC_MSG_ERROR([unable to find a valid JDK for java version $JAVA_TARGET_VERSION])])
 
     AC_MSG_NOTICE([using JDK at $JAVA_HOME])
 
@@ -35,6 +37,7 @@ AC_DEFUN([ONMS_CHECK_JDK],
     esac
 
     AC_SUBST([JAVA_SHREXT_COMMAND])
+    AC_SUBST([JAVA_TARGET_VERSION])
     AC_SUBST([JAVA_HOME])
     AC_SUBST([JAVA])
     AC_SUBST([JAR])
